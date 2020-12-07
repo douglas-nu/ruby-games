@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-LIMITE_TENTATIVAS = 3
-
 def blank_rows
   3.times { puts }
 end
@@ -9,21 +7,23 @@ end
 def welcome
   puts 'Bem vindo ao jogo de adivinhação'
   puts 'Qual é o seu nome'
-  nome = gets
+  nome = gets.strip
   blank_rows
   puts "Vamos iniciar o jogo, #{nome}"
 end
 
 def sorteia_numero_secreto
   puts 'Escolhendo um número secreto entre 0 e 200...'
-  numero_secreto = 175
+  numero_secreto = rand 200
   puts 'Número escolhido... tente adinhar: qual é o nosso número'
   numero_secreto
 end
 
-def pergunta_numero(tentativa)
-  puts "Tenhativa Nº #{tentativa} \nEntre com o número"
-  numero_chute = gets
+def pergunta_numero(tentativa, limite_tentativas, chutes)
+  puts "Tenhativa Nº #{tentativa} de #{limite_tentativas}"
+  puts "Chutes até o momento: #{chutes}"
+  puts 'Entre com o número'
+  numero_chute = gets.strip
   puts "Será que você acertou? Você chutou #{numero_chute}"
   numero_chute.to_i
 end
@@ -42,11 +42,26 @@ def verifica_chute(numero_secreto, numero_chute)
   end
 end
 
-welcome
-numero_secreto = sorteia_numero_secreto
-blank_rows
+def main
+  limite_tentativas = 3
+  chutes = []
+  pontos = 1000
 
-(1..LIMITE_TENTATIVAS).each do |i|
-  numero_chute = pergunta_numero i
-  break if verifica_chute numero_secreto, numero_chute
+  welcome
+  numero_secreto = sorteia_numero_secreto
+  blank_rows
+
+  (1..limite_tentativas).each do |i|
+    numero_chute = pergunta_numero i, limite_tentativas, chutes
+    chutes << numero_chute
+
+    pontos_a_perder = (numero_chute - numero_secreto).abs / 2.0
+    pontos -= pontos_a_perder
+
+    break if verifica_chute numero_secreto, numero_chute
+  end
+
+  puts "Você ficou com #{pontos} pontos."
 end
+
+main
